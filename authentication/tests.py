@@ -16,13 +16,21 @@ s= 'Hello World!'
 #     amount_char = 1
 # index = char_index.index(max(char_index))
 # print(sorted_s[index])
+#
+# dct = {}
+#
+# for x in s:
+#     dct[x] = dct.get(x, 0) + 1
+#
+# _max = max(dct.values())
+# for x in dct:
+#     if dct[x] == _max:
+#         print(x)
 
-dct = {}
-
-for x in s:
-    dct[x] = dct.get(x, 0) + 1
-
-_max = max(dct.values())
-for x in dct:
-    if dct[x] == _max:
-        print(x)
+# def is_palindrome(a):
+#     res=str(a)[::-1]
+#     if a == int(res):
+#         return True
+#     return False
+# a = 13431
+# print(is_palindrome(a))

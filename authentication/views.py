@@ -2,7 +2,6 @@ from datetime import timedelta, timezone, datetime
 
 from django.utils import timezone
 from drf_yasg import openapi
-from drf_yasg.openapi import Schema
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
@@ -48,8 +47,8 @@ class UserViewSet(ModelViewSet):
         otp = OTP.objects.create(user=user)
         otp.save()
 
-
-        send_otp(user_id=otp.user_id, created_at=otp.created_at,full_name=otp.user.full_name, otp_code=otp.otp_code, otp_key=otp.otp_key,
+        send_otp(user_id=otp.user_id, created_at=otp.created_at, full_name=otp.user.full_name, otp_code=otp.otp_code,
+                 otp_key=otp.otp_key,
                  type=otp.reset, email=otp.user.email)
 
         return Response(
@@ -92,8 +91,8 @@ class UserViewSet(ModelViewSet):
         return Response(
             data={
                 'result': {
-                        'full_name': serializer.validated_data['full_name'],
-                        'password': serializer.validated_data['password'],
+                    'full_name': serializer.validated_data['full_name'],
+                    'password': serializer.validated_data['password'],
                 },
                 'ok': True
             },
@@ -176,9 +175,10 @@ class UserViewSet(ModelViewSet):
             },
             status=status.HTTP_200_OK
         )
+
     @swagger_auto_schema(
         request_body=openapi.Schema(
-            type= openapi.TYPE_OBJECT,
+            type=openapi.TYPE_OBJECT,
             required=['otp_key'],
             properties={
                 "otp_key": openapi.Schema(
@@ -189,13 +189,13 @@ class UserViewSet(ModelViewSet):
         responses={
             200: openapi.Response(description='OK', schema=OTPSerializer)
         },
-            tags=['User OTP']
-        )
+        tags=['User OTP']
+    )
     def otp_resend(self, request):
         otp_key = request.data.get('otp_key')
         if not otp_key:
             raise CustomApiException(ErrorCodes.VALIDATION_FAILED)
-        otp = OTP.objects.filter(otp_key = otp_key).first()
+        otp = OTP.objects.filter(otp_key=otp_key).first()
         if not otp:
             raise CustomApiException(ErrorCodes.VALIDATION_FAILED)
         if timezone.now() - otp.created_at < timedelta(minutes=2):
@@ -204,7 +204,8 @@ class UserViewSet(ModelViewSet):
             raise CustomApiException(ErrorCodes.OTP_INVALID)
         new_otp = OTP.objects.create(user=otp.user)
         new_otp.save()
-        send_otp(user_id=new_otp.user_id, created_at=new_otp.created_at, full_name=new_otp.user.full_name, otp_code=new_otp.otp_code,
+        send_otp(user_id=new_otp.user_id, created_at=new_otp.created_at, full_name=new_otp.user.full_name,
+                 otp_code=new_otp.otp_code,
                  otp_key=new_otp.otp_key,
                  type=new_otp.reset, email=new_otp.user.email)
 
@@ -238,8 +239,8 @@ class UserLoginViewSet(ViewSet):
         access_token['login_time'] = login_time
 
         return Response(
-            data = {
-                'result':{
+            data={
+                'result': {
                     'access_token': str(access_token),
                     'refesh_token': str(refresh_token),
                 },

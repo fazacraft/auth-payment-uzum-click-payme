@@ -18,7 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
         extra_kwargs = {
-            'password' : {'write_only': True },
+            'password': {'write_only': True},
         }
 
     def create(self, validated_data):
@@ -35,11 +35,9 @@ class UserSerializer(serializers.ModelSerializer):
         if password:
             instance.password = make_password(password)
             update_fields.append('password')
-        instance.save(update_fields = update_fields)
+        instance.save(update_fields=update_fields)
 
         return instance
-
-
 
 
 class OTPSerializer(serializers.Serializer):
