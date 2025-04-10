@@ -1,6 +1,7 @@
 import uuid
 
 from django.contrib.auth.hashers import make_password
+from django.db.models import CharField
 from rest_framework import serializers
 
 from authentication.models import User
@@ -25,19 +26,10 @@ class UserSerializer(serializers.ModelSerializer):
         validated_data['password'] = make_password(validated_data.get('password'))
         return super().create(validated_data)
 
-    def update(self, instance, validated_data):
-        update_fields = []
-        full_name = validated_data.get('full_name')
-        password = validated_data.get('password')
-        if full_name:
-            instance.full_name = full_name
-            update_fields.append('full_name')
-        if password:
-            instance.password = make_password(password)
-            update_fields.append('password')
-        instance.save(update_fields=update_fields)
 
-        return instance
+class UserUpdatePasswordSerializer(serializers.Serializer):
+    password = serializers.CharField()
+
 
 
 class OTPSerializer(serializers.Serializer):

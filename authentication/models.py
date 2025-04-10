@@ -13,7 +13,6 @@ from abstract_model.base_model import BaseModel
 ROLE_CHOICE = (
     (1,'customer'),
     (2,'admin'),
-    (3,'superadmin'),
 )
 
 

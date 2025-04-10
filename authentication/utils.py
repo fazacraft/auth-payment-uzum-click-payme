@@ -26,7 +26,6 @@ def send_otp(user_id: int, created_at, full_name: str, email: str, otp_code: int
 def user_login(request):
     data = request.data
     email = data.get('email')
-    print(data['password'])
 
     user = User.objects.filter(email=email).first()
     if not user:

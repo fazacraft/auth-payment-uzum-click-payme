@@ -1,7 +1,8 @@
-from pathlib import Path
-from datetime import timedelta
-from dotenv import load_dotenv
 import os
+from datetime import timedelta
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -49,7 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'authentication.middlewares.IsAuthenticatedMiddleware',
+    'authentication.middleware.RequestLogginMiddleware',
     # 'order.middlewares.CurrentUserMiddleware',
     # 'authentication.middlewares.UserCreateRedirectMiddleware',
     # 'authentication.middlewares.UserDetailUpdateRedirectMiddleware',
@@ -185,7 +186,6 @@ SWAGGER_SETTINGS = {
 
 BASE_URL = os.getenv('BASE_URL', '')
 
-
-TELEGRAM_BOT_TOKEN =os.getenv('TELEGRAM_BOT_TOKEN', '')
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
 TELEGRAM_CHANNEL_ID = os.getenv('TELEGRAM_CHANNEL_ID', '')
 TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage?chat_id={TELEGRAM_CHANNEL_ID}&text="

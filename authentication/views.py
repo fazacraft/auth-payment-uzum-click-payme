@@ -9,7 +9,7 @@ from rest_framework.viewsets import ViewSet, ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from authentication.models import User, OTP
-from authentication.serializers import UserSerializer, OTPSerializer, LoginSerializer
+from authentication.serializers import UserSerializer, OTPSerializer, LoginSerializer, UserUpdatePasswordSerializer
 from authentication.utils import send_otp, user_login
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
@@ -30,11 +30,9 @@ class UserViewSet(ModelViewSet):
         tags=['User']
     )
     def create(self, request):
-
         data = request.data
-        print(data)
+
         user = User.objects.filter(email=data.get('email')).first()
-        print(user)
         if user and user.is_verified:
             raise CustomApiException(ErrorCodes.ALREADY_EXISTS, message='User already exists!')
         if user:
@@ -61,16 +59,15 @@ class UserViewSet(ModelViewSet):
         )
 
     @swagger_auto_schema(
-        operation_summary='Update Customer api',
-        operation_description='Update Customer api',
-        request_body=UserSerializer,
+        operation_summary='Reset Password',
+        operation_description='User Reset Password',
+        request_body=UserUpdatePasswordSerializer,
         responses={
             200: openapi.Response(
                 description="OK",
                 schema=openapi.Schema(
                     type=openapi.TYPE_OBJECT,
                     properties={
-                        "full_name": openapi.Schema(type=openapi.TYPE_STRING, description="Updated full name"),
                         "password": openapi.Schema(type=openapi.TYPE_STRING, description="Updated password (hashed)"),
                     }
                 )
@@ -80,18 +77,20 @@ class UserViewSet(ModelViewSet):
     )
     def update(self, request, pk):
         data = request.data
-        user = User.objects.filter(id=pk).first()
+        serializer = UserUpdatePasswordSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+
+        # if not serializer.is_valid():
+        #     raise CustomApiException(ErrorCodes.VALIDATION_FAILED, serializer.errors)
+        user = User.objects.filter(id = pk).first()
         if not user:
             raise CustomApiException(ErrorCodes.USER_DOES_NOT_EXIST)
-        serializer = UserSerializer(user, data=data, partial=True)
-        if not serializer.is_valid():
-            raise CustomApiException(ErrorCodes.VALIDATION_FAILED, serializer.errors)
+        serializer = UserSerializer(user, data=serializer.validated_data,partial=True)
         serializer.save()
 
         return Response(
             data={
                 'result': {
-                    'full_name': serializer.validated_data['full_name'],
                     'password': serializer.validated_data['password'],
                 },
                 'ok': True
