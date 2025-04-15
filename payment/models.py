@@ -26,7 +26,7 @@ class Transaction(BaseModel):
     payme_order = models.ForeignKey(PaymeOrder, on_delete=models.CASCADE, related_name='payme_order')
     amount = models.FloatField()
     state = models.PositiveSmallIntegerField(choices=STATE_CHOICES, default=0)
-    performed_at = models.BigIntegerField(blank=True, null=True)
+    # performed_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return f'user_id {self.account_id}: Transaction_id {self.transaction_id} for payme_order {self.payme_order}'

@@ -7,8 +7,9 @@ from rest_framework.response import Response
 
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
-from payment.models import PaymeOrder
-from payment.serializers import CheckPerformTransactionSerializer
+from payment.models import PaymeOrder, Transaction
+from payment.serializers import CheckPerformTransactionSerializer, CreateTransactionSerializer
+from payment.utils import get_performed_at_datetime, reconvert_to_ms
 
 
 # Create your views here.
@@ -16,12 +17,12 @@ from payment.serializers import CheckPerformTransactionSerializer
 
 class PaymeViewSet(ViewSet):
    @swagger_auto_schema(
-       tags=['SomsaXona']
+       tags=['Payment   ']
    )
    def post(self, request):
        payme_methods = {
            'CheckPerformTransaction': self.CheckPerformTransaction,
-           'CreateTransaction': None,
+           'CreateTransaction': self.CreateTransaction,
            'PerformTransaction': None,
        }
        method = request.data.get('method')
@@ -44,7 +45,7 @@ class PaymeViewSet(ViewSet):
        order_id = validated_data['account']['order_id']
        amount = validated_data['amount']
 
-       order = PaymeOrder.objects.filter(id = order_id).first()
+       order = PaymeOrder.objects.filter(order_id = order_id).first()
 
        if not order:
            return Response(
@@ -72,6 +73,61 @@ class PaymeViewSet(ViewSet):
            data={
                'result':{
                    'allow': True
+               }
+           }
+       )
+
+
+   def CreateTransaction(self,request):
+       serializer = CreateTransactionSerializer(data = request.data.get('params'))
+       serializer.is_valid(raise_exception=True)
+       validated_data = serializer.validated_data
+
+
+       transaction_id = validated_data['id']
+       performed_at = get_performed_at_datetime(validated_data['time'])
+       amount = validated_data['amount']
+       order_id = validated_data['account']['order_id']
+       account_id = request.user.id
+       order = PaymeOrder.objects.filter(order_id=order_id).first()
+       if not order:
+           return Response(
+               data={
+                   'error':{
+                       'code': -31050,
+                       'message': 'Buyurtma topilmadi',
+                       'data': order
+                   }
+               }
+           )
+
+       transaction = Transaction.objects.filter(transaction_id=transaction_id).first()
+       if transaction:
+           return Response(
+               data={
+                   'result':{
+                       'transaction':transaction_id,
+                       'create_time': reconvert_to_ms(transaction.performed_at),
+                       'state': transaction.state
+                   }
+               }
+           )
+
+       transaction = Transaction.objects.create(
+           transaction_id = transaction_id,
+           performed_at = performed_at,
+           amount = amount,
+           account_id = account_id,
+           state = 1,
+           payme_order = order,
+
+       )
+       return Response(
+           data={
+               'result':{
+                   'create_time': transaction.performed_at,
+                   'transaction': transaction.transaction_id,
+                   'state': transaction.state
                }
            }
        )
