@@ -36,6 +36,7 @@ class RequestLogginMiddleware:
         allowed_urls=[
             reverse('user_login'),
             reverse('user_create'),
+            reverse('payment'),
         ]
         if request.path in allowed_urls:
             return True

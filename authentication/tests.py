@@ -1,36 +1,14 @@
-from django.test import TestCase
+import time
 
-# Create your tests here.
+n = [1, 2 ,3 ,4, 54, 5,6 ,6]
+def sortbek(n):
+    for i in range(len(n)):
+        for j in range(len(n)):
+            if int(n[i]) > int(n[j]):
+                n[i], n[j] = n[j], n[i]
+    return n
 
-s= 'Hello World!'
-# sorted_s = ''.join(sorted(s))
-# print(sorted_s)
-#
-# char_index = []
-# amount_char = 1
-# step = 0
-# for i in range(len(sorted_s) -1):
-#     if sorted_s[i] == sorted_s[i+1]:
-#         amount_char +=1
-#     char_index.append(amount_char)
-#     amount_char = 1
-# index = char_index.index(max(char_index))
-# print(sorted_s[index])
-#
-# dct = {}
-#
-# for x in s:
-#     dct[x] = dct.get(x, 0) + 1
-#
-# _max = max(dct.values())
-# for x in dct:
-#     if dct[x] == _max:
-#         print(x)
-
-# def is_palindrome(a):
-#     res=str(a)[::-1]
-#     if a == int(res):
-#         return True
-#     return False
-# a = 13431
-# print(is_palindrome(a))
+start_time = time.time()
+print(sortbek(n))
+response = time.time() - start_time
+print(response)
