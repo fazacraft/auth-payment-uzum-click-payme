@@ -190,3 +190,6 @@ BASE_URL = os.getenv('BASE_URL', '')
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
 TELEGRAM_CHANNEL_ID = os.getenv('TELEGRAM_CHANNEL_ID', '')
 TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage?chat_id={TELEGRAM_CHANNEL_ID}&text="
+
+PAYME_LOGIN = os.getenv('PAYME_LOGIN', '')
+PAYME_PASSWORD = os.getenv('PAYME_PASSWORD', '')
