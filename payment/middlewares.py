@@ -19,7 +19,7 @@ class PaymeMiddleware:
                 decoded = base64.b64decode(encoded).decode()
                 login, password = decoded.split(':')
 
-                if login != settings.PAYME_LOGIN or password != settings.PAYME_PASSWORD:
+                if login != settings.PAYME_LOGIN and password != settings.PAYME_PASSWORD:
                     raise CustomApiException(ErrorCodes.UNAUTHORIZED)
 
             except Exception:
