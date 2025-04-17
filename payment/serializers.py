@@ -14,7 +14,20 @@ class CheckPerformTransactionSerializer(serializers.Serializer):
 
 
 class CreateTransactionSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
+    id = serializers.CharField()
     time = serializers.IntegerField()
     amount = serializers.FloatField()
     account = serializers.DictField()
+
+
+class PerformTransactionSerializer(serializers.Serializer):
+    id = serializers.CharField()
+
+
+class CancelTransactionSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    reason = serializers.IntegerField()
+
+
+class CheckTransactionSerializer(serializers.Serializer):
+    id = serializers.CharField()
