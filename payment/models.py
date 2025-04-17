@@ -10,6 +10,7 @@ STATE_CHOICES = (
     (0, 'initial'),
     (1, 'created'),
     (2, 'paid'),
+    (-1, 'cancelled'),
 )
 class PaymeOrder(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payme_user')
@@ -25,8 +26,11 @@ class Transaction(BaseModel):
     account_id = models.CharField(max_length=255, blank=True, null = True)
     payme_order = models.ForeignKey(PaymeOrder, on_delete=models.CASCADE, related_name='payme_order')
     amount = models.FloatField()
-    state = models.PositiveSmallIntegerField(choices=STATE_CHOICES, default=0)
-    # performed_at = models.DateTimeField(blank=True, null=True)
+    state = models.SmallIntegerField(choices=STATE_CHOICES, default=0)
+    performed_at = models.DateTimeField(blank=True, null=True)
+    canceled_at = models.DateTimeField(blank=True, null=True)
+    reason = models.SmallIntegerField(blank=True, null=True)
+
 
     def __str__(self):
         return f'user_id {self.account_id}: Transaction_id {self.transaction_id} for payme_order {self.payme_order}'
