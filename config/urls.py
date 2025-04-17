@@ -6,18 +6,18 @@ from django.views.static import serve
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
-
-admin.site.site_header = 'SRE-CRM Admin'
-admin.site.site_title = 'SRE-CRM Admin'
+#
+admin.site.site_header = 'sharingiscaring'
+admin.site.site_title = 'sharingiscaring'
 admin.site.index_title = 'Welcome to dashboard'
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="SRE-CRM APIv1",
+        title="sharingiscaring APIv1",
         default_version="v1",
-        description="API for project SRE-CRM",
+        description="API for project sharingiscaring",
         terms_of_service="",
-        contact=openapi.Contact(email="odiljonabduvaitov@gmail.com"),
+        contact=openapi.Contact(email="phazliddinphozilov@gmail.com"),
         license=openapi.License(name="BSD License"),
     ),
     public=True,
