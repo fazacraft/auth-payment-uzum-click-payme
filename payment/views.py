@@ -32,7 +32,6 @@ class PaymeViewSet(ViewSet):
             'GetStatement': None,
             'SetFiscalData': None,
 
-
         }
         method = request.data.get('method')
         handler = payme_methods.get(method)
@@ -76,7 +75,8 @@ class PaymeViewSet(ViewSet):
                         },
                         'data': order
                     }
-                }
+                },
+                status=status.HTTP_200_OK
             )
         if order.amount != amount:
             return Response(
@@ -90,7 +90,8 @@ class PaymeViewSet(ViewSet):
                         },
                         'data': amount
                     }
-                }
+                },
+                status=status.HTTP_200_OK
             )
 
         return Response(
@@ -98,7 +99,8 @@ class PaymeViewSet(ViewSet):
                 'result': {
                     'allow': True
                 }
-            }
+            },
+            status=status.HTTP_200_OK
         )
 
     def CreateTransaction(self, request):
@@ -124,21 +126,23 @@ class PaymeViewSet(ViewSet):
                         },
                         'data': order
                     }
-                }
+                },
+                status=status.HTTP_200_OK
             )
         if order.amount != amount:
             return Response(
                 data={
                     'error': {
                         'code': -31001,
-                        'mesagge': {
+                        'message': {
                             'uz': 'Noto\'g\'ri summa.',
                             'ru': 'Неверная сумма.',
                             'en': 'Invalid amount'
                         }
                     },
                     'data': order.amount
-                }
+                },
+                status=status.HTTP_200_OK
             )
         transaction = Transaction.objects.filter(transaction_id=transaction_id).first()
         if transaction:
@@ -153,9 +157,9 @@ class PaymeViewSet(ViewSet):
                                 'en': 'The operation cannot be completed.'
                             }
                         }
-                    }
+                    },
+                    status=status.HTTP_200_OK
                 )
-
 
             if is_transaction_timed_out(transaction):
                 transaction.state = -1
@@ -171,7 +175,8 @@ class PaymeViewSet(ViewSet):
                             },
                             'data': transaction
                         }
-                    }
+                    },
+                    status=status.HTTP_200_OK
                 )
             return Response(
                 data={
@@ -180,7 +185,8 @@ class PaymeViewSet(ViewSet):
                         'create_time': reconvert_to_ms(transaction.performed_at),
                         'state': transaction.state
                     }
-                }
+                },
+                status=status.HTTP_200_OK
             )
 
         transaction = Transaction.objects.create(
@@ -199,7 +205,8 @@ class PaymeViewSet(ViewSet):
                     'transaction': transaction.transaction_id,
                     'state': transaction.state
                 }
-            }
+            },
+            status=status.HTTP_200_OK
         )
 
     def PerformTransaction(self, request):
@@ -224,33 +231,36 @@ class PaymeViewSet(ViewSet):
                         },
                         'data': transaction
                     }
-                }
+                },
+                status=status.HTTP_200_OK
             )
 
         if transaction.state != 1:
-            if transaction.state !=2:
+            if transaction.state != 2:
                 return Response(
                     data={
-                        'error':{
+                        'error': {
                             'code': -31008,
-                            'message':{
+                            'message': {
                                 'uz': 'Bu operatsiyani bajarish imkonsiz.',
                                 'ru': 'Невозможно выполнить данную операцию.',
                                 'en': 'The operation cannoto be completed.'
                             },
                             'data': transaction
                         }
-                    }
+                    },
+                    status=status.HTTP_200_OK
                 )
 
             return Response(
                 data={
-                    'result':{
+                    'result': {
                         'transaction': transaction.transaction_id,
                         'perform_time': reconvert_to_ms(transaction.performed_at),
                         'state': transaction.state
                     }
-                }
+                },
+                status=status.HTTP_200_OK
             )
         if transaction.state == 1:
             # if is_transaction_timed_out(transaction):
@@ -266,8 +276,9 @@ class PaymeViewSet(ViewSet):
             #                     'en': 'The operation cannot be completed.'
             #                 },
             #                 'data': transaction
-            #             },
-            #         }
+            #             }
+            #         },
+            #                 status=status.HTTP_200_OK
             #     )
 
             transaction.state = 2
@@ -278,12 +289,13 @@ class PaymeViewSet(ViewSet):
 
             return Response(
                 data={
-                    'result':{
+                    'result': {
                         'transaction': transaction.transaction_id,
                         'perform_time': reconvert_to_ms(transaction.performed_at),
                         'state': 2
                     }
-                }
+                },
+                status=status.HTTP_200_OK
             )
 
     def CancelTransaction(self, request):
@@ -295,22 +307,22 @@ class PaymeViewSet(ViewSet):
         transaction_id = validated_data['id']
         reason = validated_data['reason']
 
-        transaction = Transaction.objects.filter(transaction_id = transaction_id).first()
+        transaction = Transaction.objects.filter(transaction_id=transaction_id).first()
         if not transaction:
             return Response(
                 data={
-                    'error':{
+                    'error': {
                         'code': -31003,
                         'message': {
                             'uz': 'Tranzaksiya topilmadi.',
                             'ru': 'Транзакция не найдена.',
                             'en': 'Transaction not found.'
                         },
-                        'data' : transaction
+                        'data': transaction
                     }
-                }
+                },
+                status=status.HTTP_200_OK
             )
-
 
         if transaction.state == 1:
             transaction.state = -1
@@ -319,14 +331,14 @@ class PaymeViewSet(ViewSet):
             transaction.save()
             return Response(
                 data={
-                    'result':{
+                    'result': {
                         'transaction': transaction.transaction_id,
                         'cancel_time': reconvert_to_ms(transaction.canceled_at),
                         'state': transaction.state
                     }
-                }
+                },
+                status=status.HTTP_200_OK
             )
-
 
         if transaction.state == 2:
             transaction.state = -2
@@ -335,12 +347,13 @@ class PaymeViewSet(ViewSet):
             transaction.save()
             return Response(
                 data={
-                    'result':{
+                    'result': {
                         'transaction': transaction.transaction_id,
                         'cancel_time': reconvert_to_ms(transaction.canceled_at),
                         'state': transaction.state
                     }
-                }
+                },
+                status=status.HTTP_200_OK
             )
 
         return Response(
@@ -354,18 +367,17 @@ class PaymeViewSet(ViewSet):
                     },
                     'state': transaction.state
                 }
-            }
+            },
+            status=status.HTTP_200_OK
         )
 
-
-
     def CheckTransaction(self, request):
-        serializer = CheckTransactionSerializer(data = request.data.get('params'))
+        serializer = CheckTransactionSerializer(data=request.data.get('params'))
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
 
         transaction_id = validated_data['id']
-        transaction = Transaction.objects.filter(transaction_id = transaction_id).first()
+        transaction = Transaction.objects.filter(transaction_id=transaction_id).first()
 
         if not transaction:
             return Response(
@@ -379,12 +391,13 @@ class PaymeViewSet(ViewSet):
                         },
                         'data': transaction
                     }
-                }
+                },
+                status=status.HTTP_200_OK
             )
 
         return Response(
             data={
-                'result':{
+                'result': {
                     'create_time': reconvert_to_ms(transaction.created_at),
                     'perform_time': reconvert_to_ms(transaction.performed_at),
                     'cancel_time': reconvert_to_ms(transaction.canceled_at),
@@ -392,5 +405,6 @@ class PaymeViewSet(ViewSet):
                     'state': transaction.state,
                     'reason': transaction.reason
                 }
-            }
+            },
+            status=status.HTTP_200_OK
         )
