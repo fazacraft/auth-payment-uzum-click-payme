@@ -5,7 +5,7 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.viewsets import ViewSet, ModelViewSet
+from rest_framework.viewsets import ViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from authentication.models import User, OTP
@@ -18,7 +18,7 @@ from exceptions.exception import CustomApiException
 # Create your views here.
 
 
-class UserViewSet(ModelViewSet):
+class UserViewSet(ViewSet):
 
     @swagger_auto_schema(
         operation_description='Create a new user!',
