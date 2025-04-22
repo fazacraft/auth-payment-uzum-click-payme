@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     # apps
     'authentication',
     'payment',
+    'click',
 
 ]
 
@@ -193,3 +194,7 @@ TELEGRAM_API_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessag
 
 PAYME_LOGIN = os.getenv('PAYME_LOGIN', '')
 PAYME_PASSWORD = os.getenv('PAYME_PASSWORD', '')
+
+
+CLICK_SERVICE_ID = os.getenv('CLICK_SERVICE_ID', '')
+CLICK_SECRET_KEY = os.getenv('CLICK_SECRET_KEY', '')
