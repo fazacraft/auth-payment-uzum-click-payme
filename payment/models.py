@@ -12,6 +12,12 @@ STATE_CHOICES = (
     (2, 'paid'),
     (-1, 'cancelled'),
 )
+
+STATUS_CHOICES = (
+    (0,'pending'),
+    (1,'paid'),
+    (-1, 'cancelled')
+)
 class PaymeOrder(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payme_user')
     order_id = models.CharField(max_length=255, unique=True)
@@ -21,7 +27,7 @@ class PaymeOrder(BaseModel):
     def __str__(self):
         return f'Payme Order {self.order_id}'
 
-class Transaction(BaseModel):
+class PaymeTransaction(BaseModel):
     transaction_id = models.CharField(max_length=255, unique=True)
     account_id = models.CharField(max_length=255, blank=True, null = True)
     payme_order = models.ForeignKey(PaymeOrder, on_delete=models.CASCADE, related_name='payme_order')
