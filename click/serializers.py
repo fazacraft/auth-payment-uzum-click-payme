@@ -27,7 +27,7 @@ class CompleteSerializer(serializers.ModelSerializer):
             'service_id',
             'click_paydoc_id',
             'merchant_trans_id',
-            'merchant_preapre_id',
+            'merchant_prepare_id',
             'amount',
             'action',
             'error',
