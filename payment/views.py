@@ -8,7 +8,7 @@ from rest_framework.viewsets import ViewSet
 
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
-from payment.models import PaymeOrder, Transaction
+from payment.models import PaymeOrder, PaymeTransaction
 from payment.serializers import CheckPerformTransactionSerializer, CreateTransactionSerializer, \
     PerformTransactionSerializer, CancelTransactionSerializer, CheckTransactionSerializer
 from payment.utils import get_performed_at_datetime, reconvert_to_ms, is_transaction_timed_out
@@ -144,7 +144,7 @@ class PaymeViewSet(ViewSet):
                 },
                 status=status.HTTP_200_OK
             )
-        transaction = Transaction.objects.filter(transaction_id=transaction_id).first()
+        transaction = PaymeTransaction.objects.filter(transaction_id=transaction_id).first()
         if transaction:
             if transaction.state != 1:
                 return Response(
@@ -189,7 +189,7 @@ class PaymeViewSet(ViewSet):
                 status=status.HTTP_200_OK
             )
 
-        transaction = Transaction.objects.create(
+        transaction = PaymeTransaction.objects.create(
             transaction_id=transaction_id,
             performed_at=performed_at,
             amount=amount,
@@ -217,7 +217,7 @@ class PaymeViewSet(ViewSet):
         print(validated_data)
         transaction_id = validated_data['id']
 
-        transaction = Transaction.objects.filter(transaction_id=transaction_id).first()
+        transaction = PaymeTransaction.objects.filter(transaction_id=transaction_id).first()
 
         if not transaction:
             return Response(
@@ -283,7 +283,7 @@ class PaymeViewSet(ViewSet):
 
             transaction.state = 2
             order = transaction.payme_order
-            order.is_paid = True
+            order.is_paid = 1
             order.save()
             transaction.save()
 
@@ -307,7 +307,7 @@ class PaymeViewSet(ViewSet):
         transaction_id = validated_data['id']
         reason = validated_data['reason']
 
-        transaction = Transaction.objects.filter(transaction_id=transaction_id).first()
+        transaction = PaymeTransaction.objects.filter(transaction_id=transaction_id).first()
         if not transaction:
             return Response(
                 data={
@@ -377,7 +377,7 @@ class PaymeViewSet(ViewSet):
         validated_data = serializer.validated_data
 
         transaction_id = validated_data['id']
-        transaction = Transaction.objects.filter(transaction_id=transaction_id).first()
+        transaction = PaymeTransaction.objects.filter(transaction_id=transaction_id).first()
 
         if not transaction:
             return Response(
