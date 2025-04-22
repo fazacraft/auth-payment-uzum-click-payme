@@ -8,11 +8,26 @@ def encrypt(test_string):
     return hashed
 
 
-def check_sign_string(click_trans_id, merchant_trans_id, amount, action, sign_time, sign_string):
+def check_sign_string_prepare(click_trans_id, merchant_trans_id, amount, action, sign_time, sign_string):
     test_string = (
             str(click_trans_id)
             + str(settings.CLICK_SERVICE_ID)
             + settings.CLICK_SECRET_KEY
+            + str(merchant_trans_id)
+            + str(amount)
+            + str(action)
+            + str(sign_time)
+    )
+    hashed_test_string = encrypt(test_string)
+    return hashed_test_string == sign_string
+
+
+def check_sign_string_complete(click_trans_id, merchant_trans_id,merchant_prepare_id, amount, action, sign_time, sign_string):
+    test_string = (
+            str(click_trans_id)
+            + str(settings.CLICK_SERVICE_ID)
+            + settings.CLICK_SECRET_KEY
+            + str(merchant_prepare_id)
             + str(merchant_trans_id)
             + str(amount)
             + str(action)
