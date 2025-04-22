@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from payment.models import PaymeOrder, Transaction
+from payment.models import PaymeOrder, PaymeTransaction
 
 
 # Register your models here.
@@ -10,6 +10,6 @@ class PaymeOrderAdmin(admin.ModelAdmin):
 
 
 
-@admin.register(Transaction)
+@admin.register(PaymeTransaction)
 class PaymeTransactionAdmin(admin.ModelAdmin):
     list_display = ['transaction_id', 'payme_order', 'amount', 'state', 'performed_at', 'canceled_at','created_at', 'updated_at']
