@@ -7,7 +7,7 @@ class ClickErrorCodes(Enum):
     InvalidAmount = -2
     ActionNotFound = -3
     AlreadyPaid = -4
-    UserNotFound = -5
+    UserNotFound_Or_OrderNotFound = -5
     TransactionNotFound = -6
     FailedToUpdateUser = -7
     ErrorInRequestFromClick = -8
