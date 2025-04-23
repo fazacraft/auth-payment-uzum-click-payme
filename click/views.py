@@ -160,6 +160,17 @@ class ClickViewSet(ViewSet):
                 status=status.HTTP_200_OK
             )
 
+        if validated_data['error'] < 0:
+            transaction.state = -1
+            transaction.saved()
+            return Response(
+                data={
+                    'error': ClickErrorCodes.TransactionCancelled.value,
+                    'error_not': ClickErrorCodes.TransactionCancelled.name
+                },
+                status=status.HTTP_200_OK
+            )
+
 
         order = PaymeOrder.objects.filter(order_id = validated_data['merchant_trans_id']).first()
         if not order:
@@ -186,16 +197,11 @@ class ClickViewSet(ViewSet):
                 },
                 status=status.HTTP_200_OK
             )
-        if validated_data['error'] < 0:
-            return Response(
-                data={
-                    'error': ClickErrorCodes.TransactionCancelled.value,
-                    'error_note': ClickErrorCodes.TransactionCancelled.name
-                }
-            )
+
         order.is_paid = True
         order.save()
         transaction.state = 2
+        transaction.save()
         return Response(
             data={
                 'error': ClickErrorCodes.Success.value,
