@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from drf_yasg.utils import swagger_auto_schema
-from requests import Response
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
@@ -263,40 +262,40 @@ class PaymeViewSet(ViewSet):
                 status=status.HTTP_200_OK
             )
         if transaction.state == 1:
-            # if is_transaction_timed_out(transaction):
-            #     transaction.state = -1
-            #     transaction.save()
-            #     return Response(
-            #         data={
-            #             'error': {
-            #                 'code': -31008,
-            #                 'message': {
-            #                     'uz': 'Operatsiyani amalga oshirib bo\'lmaydi.12312313',
-            #                     'ru': 'Невозможно выполнить операцию.',
-            #                     'en': 'The operation cannot be completed.'
-            #                 },
-            #                 'data': transaction
-            #             }
-            #         },
-            #                 status=status.HTTP_200_OK
-            #     )
+            if is_transaction_timed_out(transaction):
+                transaction.state = -1
+                transaction.save()
+                return Response(
+                    data={
+                        'error': {
+                            'code': -31008,
+                            'message': {
+                                'uz': 'Operatsiyani amalga oshirib bo\'lmaydi.12312313',
+                                'ru': 'Невозможно выполнить операцию.',
+                                'en': 'The operation cannot be completed.'
+                            },
+                            'data': transaction
+                        }
+                    },
+                    status=status.HTTP_200_OK
+                )
 
-            transaction.state = 2
-            order = transaction.payme_order
-            order.is_paid = 1
-            order.save()
-            transaction.save()
+        transaction.state = 2
+        order = transaction.payme_order
+        order.is_paid = 1
+        order.save()
+        transaction.save()
 
-            return Response(
-                data={
-                    'result': {
-                        'transaction': transaction.transaction_id,
-                        'perform_time': reconvert_to_ms(transaction.performed_at),
-                        'state': 2
-                    }
-                },
-                status=status.HTTP_200_OK
-            )
+        return Response(
+            data={
+                'result': {
+                    'transaction': transaction.transaction_id,
+                    'perform_time': reconvert_to_ms(transaction.performed_at),
+                    'state': 2
+                }
+            },
+            status=status.HTTP_200_OK
+        )
 
     def CancelTransaction(self, request):
         serializer = CancelTransactionSerializer(data=request.data.get('params'))

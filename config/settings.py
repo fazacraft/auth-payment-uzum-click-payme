@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'authentication',
     'payment',
     'click',
+    'Uzum',
 
 ]
 
@@ -198,3 +199,8 @@ PAYME_PASSWORD = os.getenv('PAYME_PASSWORD', '')
 
 CLICK_SERVICE_ID = os.getenv('CLICK_SERVICE_ID', '')
 CLICK_SECRET_KEY = os.getenv('CLICK_SECRET_KEY', '')
+
+
+UZUM_LOGIN = os.getenv('UZUM_LOGIN', '')
+UZUM_PASSWORD = os.getenv('UZUM_PASSWORD', '')
+UZUM_SERVICE_ID = os.getenv('UZUM_SERVICE_ID', '')

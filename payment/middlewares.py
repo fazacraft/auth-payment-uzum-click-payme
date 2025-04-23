@@ -1,4 +1,8 @@
 import base64
+
+from rest_framework import status
+from rest_framework.response import Response
+
 from config import settings
 from exceptions.error_messages import ErrorCodes
 from exceptions.exception import CustomApiException
@@ -19,12 +23,30 @@ class PaymeMiddleware:
                 decoded = base64.b64decode(encoded).decode()
                 login, password = decoded.split(':')
 
-                if login != settings.PAYME_LOGIN and password != settings.PAYME_PASSWORD:
-                    raise CustomApiException(ErrorCodes.UNAUTHORIZED)
+                if login != settings.PAYME_LOGIN or password != settings.PAYME_PASSWORD:
+                    return Response(
+                        data={
+                            'code': -32504,
+                            'message': {
+                                'uz': 'Avtorizatsiya yaroqsiz',
+                                'ru': 'Авторизация недействительна',
+                                'en': 'Authorization invalid',
+                            },
+                        },
+                        status=status.HTTP_200_OK
+                    )
 
             except Exception:
-                raise CustomApiException(ErrorCodes.UNAUTHORIZED)
+                return Response(
+                    data={
+                        'code': -32504,
+                        'message': {
+                            'uz': 'Xatolik yuz berdi',
+                            'ru': 'Произошла ошибка',
+                            'en': 'An error occurred',
+                        },
+                    },
+                    status=status.HTTP_200_OK
+                )
 
-
-        response = self.get_response(request)
-        return response
+        return self.get_response(request)
