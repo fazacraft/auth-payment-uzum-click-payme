@@ -21,12 +21,15 @@ def check_auth(testbek):
     return qyu == encode(test_string)
 
 
-def check_service_id(service_id):
-    return UZUM_SERVICE_ID == service_id
 
 
-def validate_service_id( service_id):
-    if not check_service_id(service_id):
+
+def validate_service_id(service_id):
+    print(UZUM_SERVICE_ID, UZUM_LOGIN, UZUM_PASSWORD)
+    if str(UZUM_SERVICE_ID) != str(service_id):
+        print(UZUM_SERVICE_ID)
+        print('Iamhere')
+        print(str(service_id))
         return Response(
             data={
                 'serviceId': service_id,
@@ -35,5 +38,4 @@ def validate_service_id( service_id):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-
     return

@@ -10,7 +10,7 @@ class UzumMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.path.startswith('uzum/'):
+        if request.path.startswith('payment/uzum/'):
             value  = request.headers.get('Authorization')
 
             if not check_auth(value):
@@ -18,7 +18,7 @@ class UzumMiddleware:
                     data={
                         'errorCode': UzumErrors.AccessDenied.value,
                     },
-                    status=status.HTTP_200_OK
+                    status=status.HTTP_400_BAD_REQUEST
                 )
 
         response = self.get_response(request)

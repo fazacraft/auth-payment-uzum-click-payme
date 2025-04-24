@@ -9,15 +9,14 @@ from Uzum.const.response_status import UzumResponse
 from Uzum.models import UzumbankTransaction
 from Uzum.serializers import VerifySerializer, CreateSerializer, ConfirmSerializer, CancelSerializer, \
     CheckStatusSerializer
-from Uzum.utils import check_service_id, validate_service_id
+from Uzum.utils import validate_service_id
 from payment.models import PaymeOrder
 from payment.utils import reconvert_to_ms
-
 
 # Create your views here.
 
 
-class UzumUserViewSet(ViewSet):
+class UzumViewSet(ViewSet):
     @swagger_auto_schema(
         request_body=VerifySerializer(),
         tags=['Uzum']
@@ -36,8 +35,8 @@ class UzumUserViewSet(ViewSet):
             )
 
         validated_data = serializer.validated_data
-        service_id_validation = validate_service_id(validated_data['service_id'])
-        if service_id_validation: return service_id_validation
+        response = validate_service_id(validated_data['serviceId'])
+        if response:return response
 
         order_id = validated_data['params']['order_id']
         order = PaymeOrder.objects.filter(order_id=order_id).first()
@@ -54,7 +53,7 @@ class UzumUserViewSet(ViewSet):
         if order.is_paid:
             return Response(
                 data={
-                    'serviceId': validated_data['service_id'],
+                    'serviceId': validated_data['serviceId'],
                     'timestamp': now_ts,
                     'errorCode': UzumErrors.PaymentAlreadyMade.value
                 },
@@ -63,8 +62,8 @@ class UzumUserViewSet(ViewSet):
 
         return Response(
             data={
-                'serviceId': validated_data['service_id'],
-                'timestamp': validated_data['time_stamp'],
+                'serviceId': validated_data['serviceId'],
+                'timestamp': now_ts,
                 'status': UzumResponse.Ok.value,
             },
             status=status.HTTP_200_OK
@@ -77,8 +76,10 @@ class UzumUserViewSet(ViewSet):
     )
     def create(self, request):
         serializer = CreateSerializer(data=request.data)
+        print(request.data)
         now_ts = reconvert_to_ms(timezone.now())
         if not serializer.is_valid():
+            print(serializer.errors, 'erororrorororo')
             return Response(
                 data={
                     'serviceId': request.data.get('serviceId'),
@@ -89,15 +90,16 @@ class UzumUserViewSet(ViewSet):
             )
 
         validated_data = serializer.validated_data
-        service_id_validation = validate_service_id(validated_data['service_id'])
+        service_id_validation = validate_service_id(validated_data['serviceId'])
         if service_id_validation: return service_id_validation
 
         order_id = validated_data['params']['order_id']
+        print(order_id)
         order = PaymeOrder.objects.filter(order_id=order_id).first()
         if not order:
             return Response(
                 data={
-                    'serviceId': validated_data['service_id'],
+                    'serviceId': validated_data['serviceId'],
                     'timestamp': now_ts,
                     'errorCode': UzumErrors.AdditionalPaymentAttributeNotFound.value
                 },
@@ -107,27 +109,27 @@ class UzumUserViewSet(ViewSet):
         if validated_data['amount'] / 100 != order.amount:
             return Response(
                 data={
-                    'serviceId': validated_data['service_id'],
+                    'serviceId': validated_data['serviceId'],
                     'timestamp': now_ts,
                     'errorCode': UzumErrors.DataVerificationError.value
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        transaction = UzumbankTransaction.objects.filter(transaction_id=validated_data['trans_id']).first()
+        transaction = UzumbankTransaction.objects.filter(transaction_id=validated_data['transId']).first()
         if transaction:
             return Response(
                 data={
-                    'serviceId': validated_data['service_id'],
+                    'serviceId': validated_data['serviceId'],
                     'timestamp': now_ts,
                     'errorCode': UzumErrors.DataVerificationError.value
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-
+        print(validated_data['transId'])
         transaction = UzumbankTransaction.objects.create(
-            transaction_id=validated_data['transaction_id'],
-            service_id=validated_data['service_id'],
+            transaction_id=validated_data['transId'],
+            service_id=validated_data['serviceId'],
             time_stamp=now_ts,
             amount=validated_data['amount'] / 100,
             order=order
@@ -137,9 +139,9 @@ class UzumUserViewSet(ViewSet):
             data={
                 'serviceId': transaction.service_id,
                 'transId': transaction.transaction_id,
-                'status': transaction.state,
+                'status': UzumResponse.Created.value,
                 'transTime': transaction.time_stamp,
-                'amount': transaction.amount * 100
+                'amount': transaction.amount
             },
             status=status.HTTP_200_OK
         )
@@ -163,37 +165,17 @@ class UzumUserViewSet(ViewSet):
             )
 
         validated_data = serializer.validated_data
-        service_id_validation = validate_service_id(validated_data['service_id'])
+        service_id_validation = validate_service_id(validated_data['serviceId'])
         if service_id_validation: return service_id_validation
 
-        order_id = validated_data['order_id']
-        order = PaymeOrder.objects.filter(order_id=order_id).first()
 
-        if not order:
-            return Response(
-                data={
-                    'serviceId': validated_data['service_id'],
-                    'timestamp': now_ts,
-                    'errorCode': UzumErrors.AdditionalPaymentAttributeNotFound.value
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        if order.amount != validated_data['amount'] / 100:
-            return Response(
-                data={
-                    'serviceId': validated_data['service_id'],
-                    'timestamp': now_ts,
-                    'errorCode': UzumErrors.DataVerificationError.value
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        transaction_id = validated_data['trans_id']
+        transaction_id = validated_data['transId']
         transaction = UzumbankTransaction.objects.filter(transaction_id=transaction_id).first()
 
         if not transaction:
             return Response(
                 data={
-                    'serviceId': validated_data['service_id'],
+                    'serviceId': validated_data['serviceId'],
                     'timestamp': now_ts,
                     'errorCode': UzumErrors.DataVerificationError.value
                 },
@@ -203,26 +185,27 @@ class UzumUserViewSet(ViewSet):
         if transaction.state != 1:
             return Response(
                 data={
-                    'serviceId': validated_data['service_id'],
+                    'serviceId': validated_data['serviceId'],
                     'timestamp': now_ts,
                     'errorCode': UzumErrors.PaymentAlreadyMade.value
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
         transaction.state = 2
-        transaction.payment_source = validated_data['payment_source']
+        transaction.payment_source = validated_data['paymentSource']
         transaction.phone = validated_data['phone']
         transaction.tariff = request.data.get('tariff')
         transaction.processing_reference_number = request.data.get('processingReferenceNumber')
-        order.is_paid = True
+        order = transaction.order
         transaction.save()
+        order.is_paid = True
         order.save()
 
         return Response(
             data={
                 'serviceId': transaction.service_id,
                 'transId': transaction.transaction_id,
-                'status': transaction.state,
+                'status': UzumResponse.Confirmed.value,
                 'confirmTime': now_ts,
                 'amount': transaction.amount * 100
             }
@@ -230,6 +213,7 @@ class UzumUserViewSet(ViewSet):
 
     @swagger_auto_schema(
         request_body=CancelSerializer,
+        responses={200: CancelSerializer()},
         tags=['Uzum']
     )
     def cancel(self,request):
@@ -246,7 +230,7 @@ class UzumUserViewSet(ViewSet):
             )
 
         validated_data = serializer.validated_data
-        service_id_validation = validate_service_id(validated_data['service_id'])
+        service_id_validation = validate_service_id(validated_data['serviceId'])
         if service_id_validation: return service_id_validation
 
         transaction_id = validated_data['transId']
@@ -255,21 +239,25 @@ class UzumUserViewSet(ViewSet):
         if not transaction:
             return Response(
                 data={
-                    'serviceId': validated_data['service_id'],
+                    'serviceId': validated_data['serviceId'],
                     'timestamp': now_ts,
                     'errorCode': UzumErrors.DataVerificationError.value
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
         transaction.state = -1
+        order = transaction.order
+        order.is_paid = False
+        order.save()
         transaction.cancelled_at = timezone.now()
         transaction.save()
 
         return Response(
             data={
-                'serviceId': validated_data['service_id'],
+                'serviceId': validated_data['serviceId'],
                 'transId': transaction.transaction_id,
-                'status': transaction.state,
+                'status': UzumResponse.Reversed.value,
+                'reverseTime': now_ts,
                 'amount': transaction.amount * 100
             }
         )
@@ -294,28 +282,32 @@ class UzumUserViewSet(ViewSet):
             )
 
         validated_data = serializer.validated_data
-        service_id_validation = validate_service_id(validated_data['service_id'])
+        service_id_validation = validate_service_id(validated_data['serviceId'])
         if service_id_validation: return service_id_validation
 
-        transaction_id = validated_data['trans_id']
+        transaction_id = validated_data['transId']
         transaction = UzumbankTransaction.objects.filter(transaction_id = transaction_id).first()
 
         if not transaction:
             return Response(
                 data={
-                    'serviceId': validated_data['service_id'],
+                    'serviceId': validated_data['serviceId'],
                     'timestamp': now_ts,
                     'errorCode': UzumErrors.DataVerificationError.value
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-
+        state = {
+            1: 'CREATED',
+            2: 'CONFIRMED',
+            -1: 'CANCELLED'
+        }
         return Response(
             data={
-                'serviceId': validated_data['service_id'],
+                'serviceId': validated_data['serviceId'],
                 'transId': transaction.transaction_id,
-                'status': transaction.state,
+                'status': state.get(transaction.state),
                 'transTime': transaction.time_stamp
             }
         )
