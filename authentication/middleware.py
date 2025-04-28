@@ -38,6 +38,11 @@ class RequestLogginMiddleware:
             reverse('user_create'),
             reverse('click_prepare'),
             reverse('click_complete'),
+            reverse('uzum_check'),
+            reverse('uzum_create'),
+            reverse('uzum_confirm'),
+            reverse('uzum_reverse'),
+            reverse('uzum_status')
         ]
         if request.path in allowed_urls:
             return True

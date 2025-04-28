@@ -2,34 +2,34 @@ from rest_framework import serializers
 
 
 class VerifySerializer(serializers.Serializer):
-    service_id = serializers.IntegerField()
-    time_stamp = serializers.IntegerField()
+    serviceId = serializers.IntegerField()
+    timestamp = serializers.IntegerField()
     params = serializers.DictField()
 
 
 class CreateSerializer(serializers.Serializer):
-    service_id = serializers.IntegerField()
+    serviceId = serializers.IntegerField()
     time_stamp = serializers.IntegerField()
-    trans_id = serializers.CharField()
+    transId = serializers.CharField()
     params = serializers.DictField()
     amount = serializers.IntegerField()
 
 
 class ConfirmSerializer(serializers.Serializer):
-    service_id = serializers.IntegerField()
-    time_stamp = serializers.IntegerField()
-    trans_id = serializers.CharField()
-    payment_source = serializers.CharField()
+    serviceId = serializers.IntegerField()
+    timestamp = serializers.IntegerField()
+    transId = serializers.CharField()
+    paymentSource = serializers.CharField()
     phone = serializers.CharField()
 
 
 class CancelSerializer(serializers.Serializer):
-    service_id = serializers.IntegerField()
-    time_stamp = serializers.IntegerField()
-    trans_id = serializers.CharField()
+    serviceId = serializers.IntegerField()
+    timestamp = serializers.IntegerField()
+    transId = serializers.CharField()
 
 
 class CheckStatusSerializer(serializers.Serializer):
-    service_id = serializers.IntegerField()
-    time_stamp = serializers.IntegerField()
-    trans_id = serializers.CharField()
+    serviceId = serializers.IntegerField()
+    timestamp = serializers.IntegerField()
+    transId = serializers.CharField()

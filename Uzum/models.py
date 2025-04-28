@@ -8,14 +8,14 @@ from payment.models import STATE_CHOICES, PaymeOrder
 STATUS_CHOICE = (
     (1, 'CREATED'),
     (2, 'CONFIRMED'),
-    (-1, 'REVERSED'),
+    (-1, 'CANCELLED'),
 )
 
 class UzumbankTransaction(BaseModel):
     transaction_id = models.CharField()
-    service_id = models.IntegerField()
-    time_stamp = models.IntegerField()
-    amount = models.IntegerField()
+    service_id = models.BigIntegerField()
+    time_stamp = models.BigIntegerField()
+    amount = models.BigIntegerField()
     tariff = models.CharField(blank=True, null=True)
     payment_source = models.CharField(blank=True, null=True)
     processing_reference_number = models.CharField(blank=True, null=True)

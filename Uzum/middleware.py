@@ -1,6 +1,4 @@
-from rest_framework import status
-from rest_framework.response import Response
-
+from django.http import JsonResponse
 from Uzum.const.errors import UzumErrors
 from Uzum.utils import check_auth
 
@@ -10,15 +8,16 @@ class UzumMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.path.startswith('uzum/'):
+        if '/payment/uzum/' in request.path:
+            print(request.headers)
             value  = request.headers.get('Authorization')
 
             if not check_auth(value):
-                return Response(
+                return JsonResponse(
                     data={
                         'errorCode': UzumErrors.AccessDenied.value,
                     },
-                    status=status.HTTP_200_OK
+                    status=400
                 )
 
         response = self.get_response(request)
