@@ -54,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'authentication.middleware.RequestLogginMiddleware',
+    'Uzum.middleware.UzumMiddleware',
     # 'order.middlewares.CurrentUserMiddleware',
     # 'authentication.middlewares.UserCreateRedirectMiddleware',
     # 'authentication.middlewares.UserDetailUpdateRedirectMiddleware',

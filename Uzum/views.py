@@ -90,8 +90,8 @@ class UzumViewSet(ViewSet):
             )
 
         validated_data = serializer.validated_data
-        service_id_validation = validate_service_id(validated_data['serviceId'])
-        if service_id_validation: return service_id_validation
+        response = validate_service_id(validated_data['serviceId'])
+        if response:return response
 
         order_id = validated_data['params']['order_id']
         print(order_id)
@@ -165,8 +165,8 @@ class UzumViewSet(ViewSet):
             )
 
         validated_data = serializer.validated_data
-        service_id_validation = validate_service_id(validated_data['serviceId'])
-        if service_id_validation: return service_id_validation
+        response = validate_service_id(validated_data['serviceId'])
+        if response: return response
 
 
         transaction_id = validated_data['transId']
@@ -230,8 +230,8 @@ class UzumViewSet(ViewSet):
             )
 
         validated_data = serializer.validated_data
-        service_id_validation = validate_service_id(validated_data['serviceId'])
-        if service_id_validation: return service_id_validation
+        response = validate_service_id(validated_data['serviceId'])
+        if response: return response
 
         transaction_id = validated_data['transId']
         transaction = UzumbankTransaction.objects.filter(transaction_id = transaction_id).first()
@@ -282,8 +282,8 @@ class UzumViewSet(ViewSet):
             )
 
         validated_data = serializer.validated_data
-        service_id_validation = validate_service_id(validated_data['serviceId'])
-        if service_id_validation: return service_id_validation
+        response = validate_service_id(validated_data['serviceId'])
+        if response: return response
 
         transaction_id = validated_data['transId']
         transaction = UzumbankTransaction.objects.filter(transaction_id = transaction_id).first()

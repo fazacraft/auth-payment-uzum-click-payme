@@ -12,8 +12,8 @@ test_string = str(UZUM_LOGIN) + ':' + str(UZUM_PASSWORD)
 
 
 def encode(test_string):
-    encoded = base64.b64encode(test_string.encode())
-    return encoded
+    encoded = base64.b64encode(test_string.encode('utf-8'))
+    return encoded.decode('utf-8')
 
 
 def check_auth(testbek):
@@ -21,15 +21,8 @@ def check_auth(testbek):
     return qyu == encode(test_string)
 
 
-
-
-
 def validate_service_id(service_id):
-    print(UZUM_SERVICE_ID, UZUM_LOGIN, UZUM_PASSWORD)
     if str(UZUM_SERVICE_ID) != str(service_id):
-        print(UZUM_SERVICE_ID)
-        print('Iamhere')
-        print(str(service_id))
         return Response(
             data={
                 'serviceId': service_id,
